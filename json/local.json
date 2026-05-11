@@ -15,14 +15,16 @@
                 "itunes.apple.com",
                 "applemusic.com",
                 "music.apple.com",
-		"contactofen.site",
-		"2026896.xyz",
-                "blobstore.apple.com"
+                "blobstore.apple.com",
+        		"2026896.xyz",
+                "ghp.indevs.in",
+                "202618.qzz.io",
+                "202618.ccwu.cc"
+                
             ]
         },
         {
             "domain_regex": [
-                "(^|\\.)dfy$",
                 "(^|\\.)edu\\.cn$"
             ]
         }
