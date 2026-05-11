@@ -1,0 +1,326 @@
+allow-lan: true
+bind-address: "*"
+mode: rule
+ipv6: true
+log-level: debug
+lan-allowed-ips:
+  - 0.0.0.0/0
+  - ::/0
+tcp-concurrent: true
+unified-delay: true
+geodata-mode: true
+geo-auto-update: true
+geo-update-interval: 24
+geodata-loader: standard
+geox-url:
+  geoip: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat
+  geosite: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat
+  mmdb: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country.mmdb
+external-controller: 0.0.0.0:9080
+external-ui: ui
+external-ui-name: metacubexd
+external-ui-url: https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip
+profile:
+  store-fake-ip: true
+dns:
+  enable: true
+  cache-algorithm: arc
+  ipv6: true
+  use-hosts: true
+  respect-rules: true
+  default-nameserver:
+    - tcp://120.53.53.53#🌐DIRECT
+    - tcp://223.5.5.5#🌐DIRECT
+  proxy-server-nameserver:
+    - https://doh.pub/dns-query#🌐DIRECT-OUT
+    - https://dns.alidns.com/dns-query#🌐DIRECT-OUT
+    - quic://dns.alidns.com:784#🌐DIRECT-OUT
+  nameserver-policy:
+    "rule-set:direct_link,wechat":
+      - https://dns.alidns.com/dns-query#🌐DIRECT-OUT
+      - https://doh.pub/dns-query#🌐DIRECT-OUT
+      - tcp://114.114.114.114#🌐DIRECT
+    "geosite:cn,geolocation-cn,bilibili,geolocation-cn@cn,apple-cn,category-ntp,microsoft@cn":
+      - https://doh.pub/dns-query#🌐DIRECT-OUT
+      - https://dns.alidns.com/dns-query#🌐DIRECT-OUT
+      - tcp://114.114.114.114#🌐DIRECT
+      - tcp://180.76.76.76#🌐DIRECT
+      - tcp://180.184.1.1#🌐DIRECT
+    "geosite:google,gfw,geolocation-!cn,openai,telegram,netflix,spotify":
+      - https://dns.google/dns-query#⛳FINAL&disable-ipv6
+      - https://dns.cloudflare.com/dns-query#⛳FINAL&disable-ipv6
+      - tcp://8.8.8.8#⛳FINAL&disable-ipv6
+      - tcp://1.1.1.1#⛳FINAL&disable-ipv6
+    '*.home.localdomain': '192.168.5.13#🔐WG-OUT'  #家庭内网自用的域名，不需要wg就移除
+
+  nameserver:
+    - https://dns.cloudflare.com/dns-query#⛳FINAL&disable-ipv6&ecs=39.149.99.99
+    - tls://one.one.one.one#⛳FINAL&disable-ipv6&ecs=39.149.99.99
+    - tls://cloudflare-dns.com#⛳FINAL&disable-ipv6&ecs=39.149.99.99
+  direct-nameserver:
+    - https://doh.pub/dns-query#🌐DIRECT
+    - https://dns.alidns.com/dns-query#🌐DIRECT
+    - tls://dns.alidns.com
+  direct-nameserver-follow-policy: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 128.32.0.0/16
+  fake-ip-filter-mode: blacklist
+  fake-ip-filter:
+    - "geosite:tencent,alibaba,cn,geolocation-cn,bilibili,geolocation-cn@cn,apple-cn,microsoft@cn,private"
+    - "geosite:openai,category-ntp"
+    - "rule-set:direct_link,wechat"
+    - '*.home.localdomain'                                #家庭内网自用的域名，不需要wg就移除
+
+hosts:
+  googleapis.cn: googleapis.com
+  dns.alidns.com:
+    - 223.5.5.5
+    - 223.6.6.6
+    - 2400:3200::1
+    - 2400:3200:baba::1
+  one.one.one.one:
+    - 1.1.1.1
+    - 1.0.0.1
+    - 2606:4700:4700::1111
+    - 2606:4700:4700::1001
+  dns.cloudflare.com:
+    - 104.16.132.229
+    - 104.16.133.229
+    - 2606:4700::6810:84e5
+    - 2606:4700::6810:85e5
+  cloudflare-dns.com:
+    - 104.16.248.249
+    - 104.16.249.249
+    - 2606:4700::6810:f8f9
+    - 2606:4700::6810:f9f9
+  dot.pub:
+    - 1.12.12.12
+    - 120.53.53.53
+  doh.pub:
+    - 1.12.12.12
+    - 120.53.53.53
+  dns.google:
+    - 8.8.8.8
+    - 8.8.4.4
+    - 2001:4860:4860::8888
+    - 2001:4860:4860::8844
+      
+sniffer:
+  enable: true
+  force-dns-mapping: true
+  parse-pure-ip: true
+  override-destination: false
+  sniff:
+    HTTP:
+      ports:
+        - 80
+        - 8080-8880
+    TLS:
+      ports:
+        - 443
+        - 8443
+###################################################################################
+#入站链接可选其中几个，除非跑裸核，否则不需要，导入到gui软件会被覆写
+listeners:
+  - name: mixed-in
+    type: mixed
+    port: 7080
+    listen: 0.0.0.0
+    udp: true
+  - name: tproxy-in
+    type: tproxy
+    port: 22016
+    listen: 0.0.0.0
+    udp: true
+  - name: redir-in
+    type: redir
+    port: 22017
+    listen: 0.0.0.0
+  - name: tun-in
+    type: tun
+    stack: system
+    dns-hijack:
+      - any:53
+      - tcp://any:53
+    device: tun0
+    mtu: 1500
+    gso: true
+    gso-max-size: 65536
+    udp-timeout: 300
+    iproute2-table-index: 2022
+    iproute2-rule-index: 9000
+    endpoint-independent-nat: true
+    auto-detect-interface: true
+    auto-route: true
+    auto-redirect: true
+    inet4-address:
+      - 192.0.2.0/30
+###################################################################################
+
+proxy-providers:
+  provider1:
+    type: http
+    url: #订阅链接
+    interval: 3600
+    path: ./example.yaml
+    proxy: 🌐DIRECT
+    header:
+      User-Agent:
+        - mihomo/1.19.24
+    health-check:
+      enable: true
+      interval: 600
+      url: https://cp.cloudflare.com/generate_204
+    override:
+      additional-prefix: M
+      
+proxies:
+  - name: 🌐DIRECT
+    type: direct
+  - name: "🔍DNS-OUT"
+    type: dns
+############################################################
+#wireguard用于访问内网，不需要可以删除,还需要删除带有wg出口标签的
+  - name: "🔐WG-OUT"
+    type: wireguard
+    ip: 172.30.8.4
+    ipv6: fcfc:abac:2026::4
+    private-key: private-key
+    peers:
+      - server: wg.example.com
+        port: 51821
+        public-key: public-key
+        allowed-ips: ['0.0.0.0/0']
+        pre-shared-key: psk
+    udp: true
+    mtu: 1408
+    dialer-proxy: "🌐DIRECT"
+    remote-dns-resolve: true 
+    dns: ['192.168.5.13']
+############################################################
+ 
+proxy-groups:
+  - name: 🎯SELECTOR
+    type: select
+    proxies:
+      - 🇯🇵日本
+      - 🇸🇬新加坡
+      - 🇺🇸美国
+      - 🇰🇷韩国
+      - 🇦🇺澳大利亚
+      - 🇭🇰中国香港
+      - 🇹🇼中国台湾
+      - 🌍ALL
+      - 🌐DIRECT
+  - name: ⛳FINAL
+    type: select
+    proxies:
+      - 🎯SELECTOR
+      - 🌐DIRECT
+  - name: 🇸🇬新加坡
+    type: url-test
+    use:
+      - provider1
+    url: https://cp.cloudflare.com/generate_204
+    interval: 3600
+    filter: 🇸🇬[^,]+|SG[^,]+
+    tolerance: 50
+    lazy: true
+  - name: 🇺🇸美国
+    type: url-test
+    use:
+      - provider1
+    url: https://www.gstatic.com/generate_204
+    interval: 3600
+    filter: 🇺🇸[^,]+|US[^,]+
+    tolerance: 50
+    lazy: true
+  - name: 🇭🇰中国香港
+    type: url-test
+    use:
+      - provider1
+    url: https://cp.cloudflare.com/generate_204
+    interval: 3600
+    filter: 🇭🇰[^,]+|HK[^,]+
+    tolerance: 50
+    lazy: true
+  - name: 🇹🇼中国台湾
+    type: url-test
+    use:
+      - provider1
+    url: https://www.gstatic.com/generate_204
+    interval: 3600
+    filter: 🇹🇼[^,]+|TW[^,]+
+    tolerance: 50
+    lazy: true
+  - name: 🇯🇵日本
+    type: url-test
+    use:
+      - provider1
+    url: https://cp.cloudflare.com/generate_204
+    interval: 3600
+    filter: 🇯🇵[^,]+|JP[^,]+
+    lazy: true
+  - name: 🇰🇷韩国
+    type: url-test
+    use:
+      - provider1
+    url: https://www.gstatic.com/generate_204
+    interval: 3600
+    filter: 🇰🇷[^,]+|KR[^,]+
+    lazy: true
+  - name: 🇦🇺澳大利亚
+    type: url-test
+    use:
+      - provider1
+    url: https://www.gstatic.com/generate_204
+    interval: 3600
+    filter: 🇦🇺[^,]+|AU[^,]+
+    tolerance: 50
+    lazy: true
+  - name: 🌍ALL
+    type: url-test
+    use:
+      - provider1
+    url: https://cp.cloudflare.com/generate_204
+    interval: 3600
+    lazy: true
+
+rule-providers:
+  direct_link:
+    behavior: domain
+    interval: 86400
+    type: http
+    proxy: ⛳FINAL
+    format: mrs
+    url: https://raw.githubusercontent.com/vxzman/rule-suite/refs/heads/m/mrs/direct.mrs
+  wechat:
+    behavior: domain
+    interval: 86400
+    type: http
+    proxy: ⛳FINAL
+    format: mrs
+    url: https://raw.githubusercontent.com/vxzman/rule-suite/refs/heads/m/mrs/wechat.mrs
+
+
+rules:
+  - AND,((NETWORK,UDP),(DST-PORT,53)),🔍DNS-OUT
+  - AND,((NETWORK,UDP),(DST-PORT,123)),🌐DIRECT
+  - AND,((NETWORK,UDP),(DST-PORT,443)),REJECT
+  - IP-CIDR,172.30.8.0/24,🔐WG-OUT,no-resolve   #不需要wg就移除
+  - IP-CIDR,192.168.5.0/24,🔐WG-OUT,no-resolve  #不需要wg就移除
+  - DOMAIN-SUFFIX,home.localdomain,🔐WG-OUT     #家庭内网自用的域名，不需要wg就移除
+  - GEOIP,private,🌐DIRECT,no-resolve
+  - RULE-SET,direct_link,🌐DIRECT
+  - RULE-SET,wechat,🌐DIRECT
+  - DOMAIN-SUFFIX,2026896.xyz,🌐DIRECT
+  - GEOSITE,bilibili,🌐DIRECT
+  - GEOSITE,tencent,🌐DIRECT
+  - GEOSITE,alibaba,🌐DIRECT
+  - GEOSITE,apple-cn,🌐DIRECT
+  - GEOSITE,microsoft@cn,🌐DIRECT
+  - GEOSITE,geolocation-cn,🌐DIRECT
+  - GEOSITE,cn,🌐DIRECT
+  - DOMAIN-KEYWORD,cn,🌐DIRECT
+  - GEOIP,CN,🌐DIRECT
+  - MATCH,⛳FINAL
