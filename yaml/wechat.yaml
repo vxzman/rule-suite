@@ -1,0 +1,51 @@
+# NAME: WeChat
+# UPDATED: 2026.05.11
+payload:
+  # 🔹 精确域名 (DOMAIN) - 来自原始 + 您的新增
+  - DOMAIN,apd-pcdnwxlogin.teg.tencent-cloud.net
+  - DOMAIN,btrace.qq.com
+  - DOMAIN,dldir1.qq.com
+  - DOMAIN,slife.xy-asia.com
+  - DOMAIN,soup.v.qq.com
+  - DOMAIN,vweixinf.tc.qq.com
+  - DOMAIN,weixin110.qq.com
+  - DOMAIN,wup.imtt.qq.com
+  - DOMAIN,short.weixin.qq.com
+  - DOMAIN,szshort.weixin.qq.com
+  - DOMAIN,szextshort.weixin.qq.com
+  - DOMAIN,szminorshort.weixin.qq.com
+  - DOMAIN,mp.weixin.qq.com
+
+  # 🔹 域名后缀 (DOMAIN-SUFFIX) - 去重后合并
+  - DOMAIN-SUFFIX,iot-tencent.com
+  - DOMAIN-SUFFIX,lbs.gtimg.com
+  - DOMAIN-SUFFIX,map.qq.com
+  - DOMAIN-SUFFIX,qlogo.cn
+  - DOMAIN-SUFFIX,qpic.cn
+  - DOMAIN-SUFFIX,servicewechat.com
+  - DOMAIN-SUFFIX,tenpay.com
+  - DOMAIN-SUFFIX,up-hl.3g.qq.com
+  - DOMAIN-SUFFIX,vweixinthumb.tc.qq.com
+  - DOMAIN-SUFFIX,wechat.com
+  - DOMAIN-SUFFIX,wechatlegal.net
+  - DOMAIN-SUFFIX,wechatos.net
+  - DOMAIN-SUFFIX,wechatpay.com
+  - DOMAIN-SUFFIX,weixin.com
+  - DOMAIN-SUFFIX,weixin.qq.com
+  - DOMAIN-SUFFIX,weixinbridge.com
+  - DOMAIN-SUFFIX,weixinsxy.com
+  - DOMAIN-SUFFIX,wx.gtimg.com
+  - DOMAIN-SUFFIX,wx.qq.com
+  - DOMAIN-SUFFIX,wxapp.tc.qq.com
+  - DOMAIN-SUFFIX,wxs.qq.com
+  - DOMAIN-SUFFIX,yun-hl.3g.qq.com
+  # 您的新增宽泛后缀
+  - DOMAIN-SUFFIX,tencent.com
+  - DOMAIN-SUFFIX,tencent-cloud.net
+  - DOMAIN-SUFFIX,qq.com
+  - DOMAIN-SUFFIX,gtimg.com
+  - DOMAIN-SUFFIX,idqqimg.com
+  - DOMAIN-SUFFIX,myqcloud.com
+
+  # 🔹 IP-ASN 规则
+  - IP-ASN,132203
