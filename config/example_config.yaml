@@ -1,8 +1,47 @@
+
+###################################################################################
+#入站链接可选其中几个，除非跑裸核，否则不需要，导入到gui软件会被覆写
+listeners:
+  - name: mixed-in
+    type: mixed
+    port: 7080
+    listen: 0.0.0.0
+    udp: true
+  - name: tproxy-in
+    type: tproxy
+    port: 22016
+    listen: 0.0.0.0
+    udp: true
+  - name: redir-in
+    type: redir
+    port: 22017
+    listen: 0.0.0.0
+  - name: tun-in
+    type: tun
+    stack: system
+    dns-hijack:
+      - any:53
+      - tcp://any:53
+    device: tun0
+    mtu: 1500
+    gso: true
+    gso-max-size: 65536
+    udp-timeout: 300
+    iproute2-table-index: 2022
+    iproute2-rule-index: 9000
+    endpoint-independent-nat: true
+    auto-detect-interface: true
+    auto-route: true
+    auto-redirect: true
+    inet4-address:
+      - 192.0.2.0/30
+###################################################################################
+
 allow-lan: true
 bind-address: "*"
 mode: rule
 ipv6: true
-log-level: debug
+log-level: info
 lan-allowed-ips:
   - 0.0.0.0/0
   - ::/0
@@ -40,19 +79,11 @@ dns:
       - https://dns.alidns.com/dns-query#🌐DIRECT-OUT
       - https://doh.pub/dns-query#🌐DIRECT-OUT
       - tcp://114.114.114.114#🌐DIRECT
-    "geosite:cn,geolocation-cn,bilibili,geolocation-cn@cn,apple-cn,category-ntp,microsoft@cn":
-      - https://doh.pub/dns-query#🌐DIRECT-OUT
-      - https://dns.alidns.com/dns-query#🌐DIRECT-OUT
-      - tcp://114.114.114.114#🌐DIRECT
-      - tcp://180.76.76.76#🌐DIRECT
-      - tcp://180.184.1.1#🌐DIRECT
     "geosite:google,gfw,geolocation-!cn,openai,telegram,netflix,spotify":
       - https://dns.google/dns-query#⛳FINAL&disable-ipv6
       - https://dns.cloudflare.com/dns-query#⛳FINAL&disable-ipv6
       - tcp://8.8.8.8#⛳FINAL&disable-ipv6
       - tcp://1.1.1.1#⛳FINAL&disable-ipv6
-    '*.home.localdomain': '192.168.5.13#🔐WG-OUT'  #家庭内网自用的域名，不需要wg就移除
-
   nameserver:
     - https://dns.cloudflare.com/dns-query#⛳FINAL&disable-ipv6&ecs=39.149.99.99
     - tls://one.one.one.one#⛳FINAL&disable-ipv6&ecs=39.149.99.99
@@ -60,7 +91,11 @@ dns:
   direct-nameserver:
     - https://doh.pub/dns-query#🌐DIRECT
     - https://dns.alidns.com/dns-query#🌐DIRECT
-    - tls://dns.alidns.com
+    - tls://dns.alidns.com#🌐DIRECT
+    - tcp://180.184.1.1#🌐DIRECT
+    - tcp://114.114.114.114#🌐DIRECT
+    - tcp://120.53.53.53#🌐DIRECT
+    - tcp://223.5.5.5#🌐DIRECT
   direct-nameserver-follow-policy: true
   enhanced-mode: fake-ip
   fake-ip-range: 128.32.0.0/16
@@ -69,7 +104,6 @@ dns:
     - "geosite:tencent,alibaba,cn,geolocation-cn,bilibili,geolocation-cn@cn,apple-cn,microsoft@cn,private"
     - "geosite:openai,category-ntp"
     - "rule-set:direct_link,wechat"
-    - '*.home.localdomain'                                #家庭内网自用的域名，不需要wg就移除
 
 hosts:
   googleapis.cn: googleapis.com
@@ -119,50 +153,13 @@ sniffer:
       ports:
         - 443
         - 8443
-###################################################################################
-#入站链接可选其中几个，除非跑裸核，否则不需要，导入到gui软件会被覆写
-listeners:
-  - name: mixed-in
-    type: mixed
-    port: 7080
-    listen: 0.0.0.0
-    udp: true
-  - name: tproxy-in
-    type: tproxy
-    port: 22016
-    listen: 0.0.0.0
-    udp: true
-  - name: redir-in
-    type: redir
-    port: 22017
-    listen: 0.0.0.0
-  - name: tun-in
-    type: tun
-    stack: system
-    dns-hijack:
-      - any:53
-      - tcp://any:53
-    device: tun0
-    mtu: 1500
-    gso: true
-    gso-max-size: 65536
-    udp-timeout: 300
-    iproute2-table-index: 2022
-    iproute2-rule-index: 9000
-    endpoint-independent-nat: true
-    auto-detect-interface: true
-    auto-route: true
-    auto-redirect: true
-    inet4-address:
-      - 192.0.2.0/30
-###################################################################################
 
 proxy-providers:
   provider1:
     type: http
-    url: #订阅链接
+    url: example.url1.com
     interval: 3600
-    path: ./example.yaml
+    path: ./url1.yaml
     proxy: 🌐DIRECT
     header:
       User-Agent:
@@ -173,31 +170,28 @@ proxy-providers:
       url: https://cp.cloudflare.com/generate_204
     override:
       additional-prefix: M
+  provider2:
+    type: http
+    url: example.url2.com
+    interval: 3600
+    path: ./url2.yaml
+    proxy: 🌐DIRECT
+    header:
+      User-Agent:
+        - mihomo/1.19.24
+    health-check:
+      enable: true
+      interval: 600
+      url: https://cp.cloudflare.com/generate_204
+    override:
+      additional-prefix: CF
       
 proxies:
   - name: 🌐DIRECT
     type: direct
   - name: "🔍DNS-OUT"
     type: dns
-############################################################
-#wireguard用于访问内网，不需要可以删除,还需要删除带有wg出口标签的
-  - name: "🔐WG-OUT"
-    type: wireguard
-    ip: 172.30.8.4
-    ipv6: fcfc:abac:2026::4
-    private-key: private-key
-    peers:
-      - server: wg.example.com
-        port: 51821
-        public-key: public-key
-        allowed-ips: ['0.0.0.0/0']
-        pre-shared-key: psk
-    udp: true
-    mtu: 1408
-    dialer-proxy: "🌐DIRECT"
-    remote-dns-resolve: true 
-    dns: ['192.168.5.13']
-############################################################
+
  
 proxy-groups:
   - name: 🎯SELECTOR
@@ -216,6 +210,7 @@ proxy-groups:
     type: select
     proxies:
       - 🎯SELECTOR
+      - 🛡️edgetunnel
       - 🌐DIRECT
   - name: 🇸🇬新加坡
     type: url-test
@@ -278,6 +273,13 @@ proxy-groups:
     filter: 🇦🇺[^,]+|AU[^,]+
     tolerance: 50
     lazy: true
+  - name: 🛡️edgetunnel
+    type: url-test
+    use:
+      - provider2
+    url: https://cp.cloudflare.com/generate_204
+    interval: 3600
+    lazy: true
   - name: 🌍ALL
     type: url-test
     use:
@@ -307,20 +309,18 @@ rules:
   - AND,((NETWORK,UDP),(DST-PORT,53)),🔍DNS-OUT
   - AND,((NETWORK,UDP),(DST-PORT,123)),🌐DIRECT
   - AND,((NETWORK,UDP),(DST-PORT,443)),REJECT
-  - IP-CIDR,172.30.8.0/24,🔐WG-OUT,no-resolve   #不需要wg就移除
-  - IP-CIDR,192.168.5.0/24,🔐WG-OUT,no-resolve  #不需要wg就移除
-  - DOMAIN-SUFFIX,home.localdomain,🔐WG-OUT     #家庭内网自用的域名，不需要wg就移除
-  - GEOIP,private,🌐DIRECT,no-resolve
   - RULE-SET,direct_link,🌐DIRECT
   - RULE-SET,wechat,🌐DIRECT
-  - DOMAIN-SUFFIX,2026896.xyz,🌐DIRECT
   - GEOSITE,bilibili,🌐DIRECT
   - GEOSITE,tencent,🌐DIRECT
+  - GEOSITE,zhihu,🌐DIRECT
+  - GEOSITE,douyin,🌐DIRECT
   - GEOSITE,alibaba,🌐DIRECT
   - GEOSITE,apple-cn,🌐DIRECT
   - GEOSITE,microsoft@cn,🌐DIRECT
   - GEOSITE,geolocation-cn,🌐DIRECT
   - GEOSITE,cn,🌐DIRECT
-  - DOMAIN-KEYWORD,cn,🌐DIRECT
+  - GEOIP,private,🌐DIRECT,no-resolve
   - GEOIP,CN,🌐DIRECT
   - MATCH,⛳FINAL
+
