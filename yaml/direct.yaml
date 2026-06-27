@@ -1,13 +1,30 @@
 payload:
-    - icloud.com.cn
-    - dns.alidns.com
-    - doh.pub
-    - dot.pub
-    - +.applemusic.com
-    - +.apple.com
-    - +.edu.cn
-    - +.zaobao.com
-    - +.2026896.xyz
-    - +.202618.ccwu.cc
-    - +.202618.qzz.io
-    - +.ghp.indevs.in
+  # 已确认的AI服务（涵盖主流平台）
+  - +.deepseek.com
+  - +.qwen.ai
+  - +.qianwen.com
+  - +.doubao.com
+  - +.yiyan.baidu.com
+  - +.kimi.moonshot.cn
+  - +.chatglm.cn
+  - +.yuanbao.tencent.com
+  - +.xinghuo.xfyun.cn
+  - +.jimeng.cn
+  - +.jimeng.jianying.com
+  - +.klingai.kuaishou.com
+  - +.ai.wps.cn
+  - +.metaso.cn
+  - +.tongyi.aliyun.com      # 通义系列入口
+  - +.aliyun.com             # 阿里云生态（含通义相关服务）
+  - icloud.com.cn
+  - dns.alidns.com
+  - doh.pub
+  - dot.pub
+  - +.applemusic.com
+  - +.apple.com
+  - +.edu.cn
+  - +.zaobao.com
+  - +.2026896.xyz
+  - +.202618.ccwu.cc
+  - +.202618.qzz.io
+  - +.ghp.indevs.in
